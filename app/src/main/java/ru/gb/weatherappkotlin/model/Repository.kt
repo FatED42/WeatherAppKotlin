@@ -2,7 +2,15 @@ package ru.gb.weatherappkotlin.model
 
 import ru.gb.weatherappkotlin.domain.Weather
 
-interface Repository {
+fun interface RepositoryCurrentCityWeather {
     fun getWeather(lat: Double, lon: Double): Weather
-    fun getWeatherList(): List<Weather>
+}
+
+fun interface RepositoryCitiesListWeather {
+    fun getWeatherList(location: WeatherLocation): List<Weather>
+}
+
+sealed class WeatherLocation {
+    object Russia : WeatherLocation()
+    object World : WeatherLocation()
 }

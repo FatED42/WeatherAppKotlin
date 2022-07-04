@@ -1,13 +1,22 @@
 package ru.gb.weatherappkotlin.model
 
 import ru.gb.weatherappkotlin.domain.Weather
+import ru.gb.weatherappkotlin.domain.getRussianCities
+import ru.gb.weatherappkotlin.domain.getWorldCities
 
-class RepositoryLocalImpl : Repository {
+class RepositoryLocalImpl : RepositoryCurrentCityWeather, RepositoryCitiesListWeather {
     override fun getWeather(lat: Double, lon: Double): Weather {
         return Weather()
     }
 
-    override fun getWeatherList(): List<Weather> {
-        return listOf(Weather())
+    override fun getWeatherList(location: WeatherLocation): List<Weather> {
+        return when (location) {
+            WeatherLocation.Russia -> {
+                getRussianCities()
+            }
+            WeatherLocation.World -> {
+                getWorldCities()
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import ru.gb.weatherappkotlin.R
 import ru.gb.weatherappkotlin.databinding.FragmentWeatherListBinding
 import ru.gb.weatherappkotlin.viewmodel.AppState
 
@@ -16,6 +17,8 @@ class WeatherListFragment : Fragment() {
     companion object {
         fun newInstance() = WeatherListFragment()
     }
+
+    var isRussian = true
 
     lateinit var viewModel: WeatherListViewModel
 
@@ -47,15 +50,25 @@ class WeatherListFragment : Fragment() {
                 renderData(t)
             }
         })
-        viewModel.sentRequest()
+
+        binding.weatherListFragmentFAB.setOnClickListener {
+            isRussian = !isRussian
+            if (isRussian) {
+                viewModel.getWeatherForRussia()
+                binding.weatherListFragmentFAB.setImageResource(R.drawable.ic_russia)
+            } else {
+                viewModel.getWeatherForWorld()
+                binding.weatherListFragmentFAB.setImageResource(R.drawable.ic_earth)
+            }
+        }
+        viewModel.getWeatherForRussia()
     }
 
     private fun renderData(appState: AppState) {
         when (appState) {
-            AppState.Loading -> binding.loadingLayout.visibility = View.VISIBLE
+            is AppState.Loading -> {}
 
             is AppState.Error -> {
-                binding.loadingLayout.visibility = View.GONE
                 Toast.makeText(
                     requireContext(),
                     "При загрузке данных произошла ошибка",
@@ -63,13 +76,12 @@ class WeatherListFragment : Fragment() {
                 ).show()
             }
 
-            is AppState.Success -> {
+            is AppState.SuccessCurrentCity -> {
                 val result = appState.weatherData
-                binding.cityName.text = result.city.cityName
-                binding.temperatureValue.text = result.temperature.toString()
-                binding.feelsLikeValue.text = result.feelsLike.toString()
-                binding.cityCoordinates.text = "${result.city.lat}, ${result.city.lon}"
-                binding.loadingLayout.visibility = View.GONE
+            }
+            is AppState.SuccessCitiesList -> {
+                binding.mainFragmentRecyclerView.adapter =
+                    WeatherListRVAdapter(appState.weatherList)
             }
         }
     }
