@@ -10,8 +10,8 @@ class WeatherListViewModel(
     private val liveData: MutableLiveData<AppState> = MutableLiveData<AppState>()
 ) : ViewModel() {
 
-    lateinit var repositoryCitiesListWeather: RepositoryCitiesListWeather
-    lateinit var repositoryCurrentCityWeather: RepositoryCurrentCityWeather
+    private lateinit var repositoryCitiesListWeather: RepositoryCitiesListWeather
+    private lateinit var repositoryCurrentCityWeather: RepositoryCurrentCityWeather
 
     fun getLiveData(): MutableLiveData<AppState> {
         choiceRepository()
@@ -36,9 +36,9 @@ class WeatherListViewModel(
 
     private fun sentRequest(location: WeatherLocation) {
         liveData.value = AppState.Loading
-
-        if (false) {
-            liveData.postValue(AppState.Error(throw IllegalStateException("Something went wrong")))
+        val rand = Random(System.nanoTime())
+        if ((0..3).random(rand) == 1) {
+            liveData.postValue(AppState.Error(IllegalStateException("Something went wrong")))
         } else {
             liveData.postValue(
                 AppState.SuccessCitiesList(

@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.snackbar.Snackbar
 import ru.gb.weatherappkotlin.R
 import ru.gb.weatherappkotlin.databinding.FragmentWeatherListBinding
 import ru.gb.weatherappkotlin.domain.Weather
@@ -55,34 +56,36 @@ class WeatherListFragment : Fragment(), OnItemClick {
         })
 
         binding.weatherListFragmentFAB.setOnClickListener {
-            isRussian = !isRussian
-            if (isRussian) {
-                viewModel.getWeatherForRussia()
-                binding.weatherListFragmentFAB.setImageResource(R.drawable.ic_russia)
-            } else {
-                viewModel.getWeatherForWorld()
-                binding.weatherListFragmentFAB.setImageResource(R.drawable.ic_earth)
-            }
+            whichListToChoose()
         }
         viewModel.getWeatherForRussia()
     }
 
     private fun renderData(appState: AppState) {
         when (appState) {
-            is AppState.Loading -> {}
+            is AppState.Loading -> {
+                binding.mainFragmentLoadingLayout.visibility = View.VISIBLE
+            }
 
             is AppState.Error -> {
+                binding.mainFragmentLoadingLayout.visibility = View.GONE
                 Toast.makeText(
                     requireContext(),
                     "При загрузке данных произошла ошибка",
                     Toast.LENGTH_LONG
                 ).show()
+                Snackbar.make(binding.root, "Error", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Reload") {
+                        whichListToChoose()
+                    }
+                    .show()
             }
 
             is AppState.SuccessCurrentCity -> {
                 val result = appState.weatherData
             }
             is AppState.SuccessCitiesList -> {
+                binding.mainFragmentLoadingLayout.visibility = View.GONE
                 binding.mainFragmentRecyclerView.adapter =
                     WeatherListRVAdapter(appState.weatherList, this)
             }
@@ -97,4 +100,14 @@ class WeatherListFragment : Fragment(), OnItemClick {
             .commit()
     }
 
+    private fun whichListToChoose() {
+        isRussian = !isRussian
+        if (isRussian) {
+            viewModel.getWeatherForRussia()
+            binding.weatherListFragmentFAB.setImageResource(R.drawable.ic_russia)
+        } else {
+            viewModel.getWeatherForWorld()
+            binding.weatherListFragmentFAB.setImageResource(R.drawable.ic_earth)
+        }
+    }
 }
