@@ -10,9 +10,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import ru.gb.weatherappkotlin.R
 import ru.gb.weatherappkotlin.databinding.FragmentWeatherListBinding
+import ru.gb.weatherappkotlin.domain.Weather
+import ru.gb.weatherappkotlin.view.weatherdetails.OnItemClick
+import ru.gb.weatherappkotlin.view.weatherdetails.WeatherDetailsFragment
 import ru.gb.weatherappkotlin.viewmodel.AppState
 
-class WeatherListFragment : Fragment() {
+class WeatherListFragment : Fragment(), OnItemClick {
 
     companion object {
         fun newInstance() = WeatherListFragment()
@@ -81,9 +84,17 @@ class WeatherListFragment : Fragment() {
             }
             is AppState.SuccessCitiesList -> {
                 binding.mainFragmentRecyclerView.adapter =
-                    WeatherListRVAdapter(appState.weatherList)
+                    WeatherListRVAdapter(appState.weatherList, this)
             }
         }
+    }
+
+    override fun onItemClick(weather: Weather) {
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .hide(this)
+            .add(R.id.container, WeatherDetailsFragment.newInstance(weather)).addToBackStack("")
+            .commit()
     }
 
 }

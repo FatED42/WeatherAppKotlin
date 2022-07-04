@@ -6,8 +6,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.gb.weatherappkotlin.databinding.FragmentWeatherListRecyclerItemBinding
 import ru.gb.weatherappkotlin.domain.Weather
+import ru.gb.weatherappkotlin.view.weatherdetails.OnItemClick
 
-class WeatherListRVAdapter(private val dataList: List<Weather>) :
+class WeatherListRVAdapter(private val dataList: List<Weather>, private val callback: OnItemClick) :
     RecyclerView.Adapter<WeatherListRVAdapter.WeatherViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeatherViewHolder {
@@ -24,10 +25,13 @@ class WeatherListRVAdapter(private val dataList: List<Weather>) :
         return dataList.size
     }
 
-    class WeatherViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class WeatherViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(weather: Weather) {
             val binding = FragmentWeatherListRecyclerItemBinding.bind(itemView)
             binding.cityName.text = weather.city.cityName
+            binding.root.setOnClickListener {
+                callback.onItemClick(weather)
+            }
         }
     }
 }
