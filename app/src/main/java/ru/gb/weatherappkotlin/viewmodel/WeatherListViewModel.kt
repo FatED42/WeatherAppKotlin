@@ -1,9 +1,8 @@
-package ru.gb.weatherappkotlin.view.weatherlist
+package ru.gb.weatherappkotlin.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.gb.weatherappkotlin.model.*
-import ru.gb.weatherappkotlin.viewmodel.AppState
 import kotlin.random.Random
 
 class WeatherListViewModel(
@@ -36,16 +35,20 @@ class WeatherListViewModel(
 
     private fun sentRequest(location: WeatherLocation) {
         liveData.value = AppState.Loading
-        val rand = Random(System.nanoTime())
-        if ((0..3).random(rand) == 1) {
-            liveData.postValue(AppState.Error(IllegalStateException("Something went wrong")))
-        } else {
-            liveData.postValue(
-                AppState.SuccessCitiesList(
-                    repositoryCitiesListWeather.getWeatherList(location)
+        Thread {
+            Thread.sleep(1500L)
+            val rand = Random(System.nanoTime())
+            if ((0..3).random(rand) == 1) {
+                liveData.postValue(AppState.Error(IllegalStateException("Something went wrong")))
+            } else {
+                liveData.postValue(
+                    AppState.SuccessCitiesList(
+                        repositoryCitiesListWeather.getWeatherList(location)
+                    )
                 )
-            )
-        }
+            }
+        }.start()
+
     }
 
     private fun isConnection(): Boolean {
